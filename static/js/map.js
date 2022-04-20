@@ -38,7 +38,10 @@
     /*===================================================
                           GEOJSON               
     ===================================================*/
-    
+    var geojsonLayer = new L.GeoJSON.AJAX('[');
+
+    L.geoJSON(geojsonFeature).addTo(map);
+
     /*
     var linedata = L.geoJSON(lineJSON).addTo(map);
     var pointdata = L.geoJSON(pointJSON).addTo(map);

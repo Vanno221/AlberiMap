@@ -5,10 +5,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
+#################################################
+# Database Setup
+#################################################
+
 db_name = 'Alberi.db'
 
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///static/' + db_name
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///static/db/' + db_name
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 db = SQLAlchemy(app)
@@ -22,11 +25,14 @@ class Alberi(db.Model):
     SPECIE = db.Column(db.String)
 
 
+#################################################
+# Flask Setup
+#################################################
+
 @app.route("/")
 def home():
     return render_template("home.html")
 
-# New functions
 @app.route("/about/")
 def about():
     return render_template("about.html")
