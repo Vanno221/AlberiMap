@@ -1,199 +1,158 @@
+var map = L.map('map').fitWorld();
+map.locate({setView: true, maxZoom: 16});
 
-    var map = L.map('map').setView([40.7128,-74.0060], 4);
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-    osm.addTo(map);
-    
-    /*===================================================
-                          MARKER               
-    ===================================================*/
-    
-    var singleMarker = L.marker([28.25255,83.97669]);
-    singleMarker.addTo(map);
-    var popup = singleMarker.bindPopup('This is a popup')
-    popup.addTo(map);
-    
-    /*===================================================
-                         TILE LAYER               
-    ===================================================*/
-    
-    // Google Map Layer
-    
-    googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
-        maxZoom: 20,
-        subdomains:['mt0','mt1','mt2','mt3']
-     });
-     googleStreets.addTo(map);
-    
-     // Satelite Layer
-    googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-       maxZoom: 20,
-       subdomains:['mt0','mt1','mt2','mt3']
-     });
-    googleSat.addTo(map);
-    
-    
-    
-    /*===================================================
-                          GEOJSON               
-    ===================================================*/
-    var geojsonLayer = new L.GeoJSON.AJAX('[');
+/*##############################################################################################
+                                            MAP LAYER                                           
+###############################################################################################*/
 
-    L.geoJSON(geojsonFeature).addTo(map);
+/*
+googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+    maxZoom: 18,
+    subdomains:['mt0','mt1','mt2','mt3']
+ }).addTo(map);
+*/
 
-    /*
-    var linedata = L.geoJSON(lineJSON).addTo(map);
-    var pointdata = L.geoJSON(pointJSON).addTo(map);
-    var nepalData = L.geoJSON(nepaldataa).addTo(map);
-    var polygondata = L.geoJSON(polygonJSON,{
-        onEachFeature: function(feature,layer){
-            layer.bindPopup('<b>This is a </b>' + feature.properties.name)
-        },
-        style:{
-            fillColor: 'red',
-            fillOpacity:1,
-            color: 'green'
+/* Open Street Map */
+var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="http://osm.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+
+/*
+var wmsLayers = {
+    'Mappa Alberi Comune Firenze': L.tileLayer.wms("http://tms.comune.fi.it/tiles/service/wms?",{
+    layers: "sivep:alberi_pubblici_ComuneFI",
+    format: 'image/png', transparent: true,
+    })};
+
+L.control.layers({osm}, wmsLayers).addTo(map);
+*/
+
+
+/*##############################################################################################
+                                            GEOJSON                                        
+###############################################################################################*/
+
+var geojsonFeatureCollection = {"type":"FeatureCollection", "features": [
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[1684996.13000488,4848185.5]},"properties":{"ID":42484,"CODSITO_AL":33062,"QUARTIERE":"3","SPECIE":"Clerodendrum","NOME_COMUN":"clerodendro","CIRCONF_CM":20}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[1684999.51000977,4848185.05999756]},"properties":{"ID":42487,"CODSITO_AL":33063,"QUARTIERE":"3","SPECIE":"Clerodendrum","NOME_COMUN":"clerodendro","CIRCONF_CM":20}}]};
+
+
+L.geoJSON(geojsonFeatureCollection, {
+    pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, geojsonMarkerOptions);
+    },
+    onEachFeature: function (feature, osm) {
+        if (feature.properties) {
+            osm.bindPopup(feature.properties.NOME_COMUN);
         }
-    }).addTo(map);
-    */
+    }
+}).addTo(map);
 
-    /*===================================================
-                          LAYER CONTROL               
-    ===================================================*/
-    
-    var baseLayers = {
-        "Satellite":googleSat,
-        "Google Map":googleStreets,
-        "OpenStreetMap": osm,
-    };
-    
-    var overlays = {
-        "Marker": singleMarker,
-        "PointData":pointdata,
-        "LineData":linedata,
-        "PolygonData":polygondata
-    };
-    
-    L.control.layers(baseLayers, overlays).addTo(map);
-    
-    
-    /*===================================================
-                          SEARCH BUTTON               
-    ===================================================*/
-    
-    L.Control.geocoder().addTo(map);
-    
-    
-    /*===================================================
-                          Choropleth Map               
-    ===================================================*/
-    /*
-    L.geoJSON(statesData).addTo(map);
-    
-    
-    function getColor(d) {
-        return d > 1000 ? '#800026' :
-               d > 500  ? '#BD0026' :
-               d > 200  ? '#E31A1C' :
-               d > 100  ? '#FC4E2A' :
-               d > 50   ? '#FD8D3C' :
-               d > 20   ? '#FEB24C' :
-               d > 10   ? '#FED976' :
-                          '#FFEDA0';
+/*##############################################################################################
+                                            MARKER
+###############################################################################################*/
+
+var singleMarker = L.marker([51.5, -0.09]).addTo(map);
+
+var circle = L.circle([51.508, -0.11], {
+    color: 'red',
+    fillColor: '#f03',
+    fillOpacity: 0.5,
+    radius: 500
+}).addTo(map);
+
+var polygon = L.polygon([
+    [51.509, -0.08],
+    [51.503, -0.06],
+    [51.51, -0.047]
+]).addTo(map);
+
+var geojsonMarkerOptions = {
+    radius: 500,
+    fillColor: "#ff7800",
+    color: 'green',
+    fillOpacity: 0.5
+};
+
+
+/*##############################################################################################
+                                            POPUP
+###############################################################################################*/
+
+singleMarker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
+circle.bindPopup("I am a circle.");
+
+
+/*##############################################################################################
+                                            POPUP LAYER
+###############################################################################################*/
+
+var popup = L.popup()
+    .setLatLng([51.5, -0.09])
+    .setContent("I am a standalone popup.")
+    .openOn(map);
+
+
+
+/*##############################################################################################
+                                            ICON    
+###############################################################################################*/
+
+var LeafIcon = L.Icon.extend({
+    options: {
+        shadowUrl: '../img/leaf-shadow.png',
+        iconSize:     [38, 95],
+        shadowSize:   [50, 64],
+        iconAnchor:   [22, 94],
+        shadowAnchor: [4, 62],
+        popupAnchor:  [-3, -76]
     }
-    
-    function style(feature) {
-        return {
-            fillColor: getColor(feature.properties.density),
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7
-        };
-    }
-    
-    L.geoJson(statesData, {style: style}).addTo(map);
-    
-    function highlightFeature(e) {
-        var layer = e.target;
-    
-        layer.setStyle({
-            weight: 5,
-            color: '#666',
-            dashArray: '',
-            fillOpacity: 0.7
-        });
-    
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-    
-        info.update(layer.feature.properties);
-    }
-    
-    function resetHighlight(e) {
-        geojson.resetStyle(e.target);
-        info.update();
-    }
-    
-    var geojson;
-    // ... our listeners
-    geojson = L.geoJson(statesData);
-    
-    function zoomToFeature(e) {
-        map.fitBounds(e.target.getBounds());
-    }
-    
-    function onEachFeature(feature, layer) {
-        layer.on({
-            mouseover: highlightFeature,
-            mouseout: resetHighlight,
-            click: zoomToFeature
-        });
-    }
-    
-    geojson = L.geoJson(statesData, {
-        style: style,
-        onEachFeature: onEachFeature
-    }).addTo(map);
-    
-    var info = L.control();
-    
-    info.onAdd = function (map) {
-        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-        this.update();
-        return this._div;
-    };
-    
-    // method that we will use to update the control based on feature properties passed
-    info.update = function (props) {
-        this._div.innerHTML = '<h4>US Population Density</h4>' +  (props ?
-            '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
-            : 'Hover over a state');
-    };
-    
-    info.addTo(map);
-    
-    var legend = L.control({position: 'bottomright'});
-    
-    legend.onAdd = function (map) {
-    
-        var div = L.DomUtil.create('div', 'info legend'),
-            grades = [0, 10, 20, 50, 100, 200, 500, 1000],
-            labels = [];
-    
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-        }
-    
-        return div;
-    };
-    
-    legend.addTo(map);
-    */
-    
+});
+
+var greenIcon = new LeafIcon({iconUrl: '../img/leaf-green.png'}),
+    redIcon = new LeafIcon({iconUrl: '../img/leaf-red.png'}),
+    orangeIcon = new LeafIcon({iconUrl: '../img/leaf-orange.png'});
+
+L.marker([51.5, -0.09], {icon: greenIcon}).addTo(map).bindPopup("I am a green leaf.");
+L.marker([51.495, -0.083], {icon: redIcon}).addTo(map).bindPopup("I am a red leaf.");
+L.marker([51.49, -0.1], {icon: orangeIcon}).addTo(map).bindPopup("I am an orange leaf.");
+
+
+/*##############################################################################################
+                                            EVENT
+###############################################################################################*/
+
+function onMapClick(e) {
+
+    var popup = L.popup()
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+
+    //alert("You clicked the map at " + e.latlng);
+}
+
+map.on('click', onMapClick);
+
+
+/*##############################################################################################
+                                            LOCATION
+###############################################################################################*/
+
+function onLocationFound(e) {
+    var radius = e.accuracy;
+
+    L.marker(e.latlng).addTo(map)
+        .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+    L.circle(e.latlng, radius).addTo(map);
+}
+
+map.on('locationfound', onLocationFound);
+
+function onLocationError(e) {
+    alert(e.message);
+}
+
+map.on('locationerror', onLocationError);
